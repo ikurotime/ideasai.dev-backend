@@ -1,20 +1,20 @@
-package valueobject
+package value_object
 
 import "fmt"
- 
+
 type UserID int
 
 func NewUserID(ID int) UserID {
-     return UserID(ID)
+	return UserID(ID)
 }
 
 func (u *UserID) String() string {
-    return fmt.Sprintf("%d", *u)
+	return fmt.Sprintf("%d", *u)
 }
 
 func (u *UserID) Validate() bool {
-    if *u == 0 {
-        return false
-    }
-    return true
+	if *u == 0 {
+		return false
+	}
+	return true
 }

@@ -2,32 +2,40 @@ package http
 
 import (
 	"fmt"
-	"io"
+	"ikurotime/ideasai/internal/application/query"
+	pkg "ikurotime/ideasai/pkg/query"
 	"net/http"
 
 	"go.uber.org/zap"
 )
 
 type HelloHandler struct {
-	log *zap.Logger
+	queryBus pkg.QueryBus
+	log      *zap.Logger
 }
 
 func NewHelloHandler(log *zap.Logger) *HelloHandler {
 	return &HelloHandler{log: log}
 }
 func (*HelloHandler) Pattern() string {
-	return "/hello"
+	return "/project/{id}"
 }
 
 func (h *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
+	var q query.FindProjectQuery
+	id := r.PathValue("id")
+	h.log.Info("HelloHandler.ServeHTTP", zap.String("id", id))
+
+	q.ID = id
+
+	response, err := h.queryBus.Execute(&q)
+
 	if err != nil {
-		h.log.Error("Failed to read request", zap.Error(err))
+		h.log.Error("Failed to execute query", zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
 	}
 
-	if _, err := fmt.Fprintf(w, "Hello, %s\n", body); err != nil {
+	if _, err := fmt.Fprintf(w, "%s\n", response); err != nil {
 		h.log.Error("Failed to write response", zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
