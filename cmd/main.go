@@ -14,9 +14,9 @@ func main() {
 		fx.Provide(
 			NewHTTPServer,
 			fx.Annotate(
-				NewServeMux,
+				NewHTTPRouterGinGonic,
 				fx.ParamTags(`group:"routes"`)),
-			AsRoute(NewHelloHandler),
+			AsRoute(NewFindProjectByIDRoute),
 			zap.NewExample),
 		fx.Invoke(func(*http.Server) {}),
 	).Run()

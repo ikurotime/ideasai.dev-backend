@@ -5,17 +5,22 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
 
 type Route interface {
-	http.Handler
+	Handler(ctx *gin.Context)
+	Method() string
 	Pattern() string
 }
 
-func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *zap.Logger) *http.Server {
-	srv := &http.Server{Addr: ":8080", Handler: mux}
+func NewHTTPServer(lc fx.Lifecycle, router http.Handler, log *zap.Logger) *http.Server {
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			ln, err := net.Listen("tcp", srv.Addr)
@@ -34,13 +39,12 @@ func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *zap.Logger) *http.S
 	return srv
 }
 
-func NewServeMux(routes []Route, log *zap.Logger) *http.ServeMux {
-	mux := http.NewServeMux()
+func NewHTTPRouterGinGonic(routes []Route) http.Handler {
+	router := gin.Default()
 	for _, route := range routes {
-		log.Info("Registering route", zap.String("pattern", route.Pattern()))
-		mux.Handle(route.Pattern(), route)
+		router.Handle(route.Method(), route.Pattern(), route.Handler)
 	}
-	return mux
+	return router
 }
 
 func AsRoute(f any) any {
