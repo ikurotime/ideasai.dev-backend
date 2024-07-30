@@ -1,8 +1,10 @@
 package pkg
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type QueryHandler interface {
-	Handle(query Query) (QueryReponse error)
+	Handle(query Query) (QueryResponse, error)
 	QueryType() reflect.Type
 }
