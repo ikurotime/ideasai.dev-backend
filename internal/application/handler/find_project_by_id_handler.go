@@ -14,10 +14,10 @@ import (
 
 type FindProjectByIdHandler struct {
 	repository repositories.ProjectRepository
-	log        zap.Logger
+	log        *zap.Logger
 }
 
-func NewFindProjectHandler(repository repositories.ProjectRepository, log zap.Logger) pkg.QueryHandler {
+func NewFindProjectHandler(repository repositories.ProjectRepository, log *zap.Logger) pkg.QueryHandler {
 	return &FindProjectByIdHandler{
 		repository: repository,
 		log:        log,
@@ -25,7 +25,7 @@ func NewFindProjectHandler(repository repositories.ProjectRepository, log zap.Lo
 }
 
 func (h *FindProjectByIdHandler) Handle(query pkg.Query) (pkg.QueryResponse, error) {
-	findProjectQuery, ok := query.(q.FindProjectQuery)
+	findProjectQuery, ok := query.(q.FindProjectByIDQuery)
 	if !ok {
 		h.log.Error("FindProjectHandler.Handle", zap.String("error", "invalid query type"))
 		return nil, fmt.Errorf("invalid query type")
@@ -37,9 +37,13 @@ func (h *FindProjectByIdHandler) Handle(query pkg.Query) (pkg.QueryResponse, err
 		return nil, err
 	}
 	h.log.Info("FindProjectHandler.Handle", zap.Any("project", project))
-	return project, nil
+	return q.FindProjectByIDQueryResponse{
+		ID:          "proj_001",
+		Description: "Project 001",
+		Category:    "Category 001",
+	}, nil
 }
 
 func (h *FindProjectByIdHandler) QueryType() reflect.Type {
-	return reflect.TypeOf(query.FindProjectQuery{})
+	return reflect.TypeOf(query.FindProjectByIDQuery{})
 }

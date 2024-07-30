@@ -1,4 +1,4 @@
-package handler
+package repository
 
 import (
 	"ikurotime/ideasai/internal/domain/repositories"
@@ -9,10 +9,10 @@ import (
 )
 
 type ProjectRepository struct {
-	log zap.Logger
+	log *zap.Logger
 }
 
-func NewProjectRepository(log zap.Logger) repositories.ProjectRepository {
+func NewProjectRepository(log *zap.Logger) repositories.ProjectRepository {
 	return &ProjectRepository{
 		log: log,
 	}

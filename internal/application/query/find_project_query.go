@@ -1,10 +1,10 @@
 package query
 
-type FindProjectQuery struct {
+type FindProjectByIDQuery struct {
 	ID string `json:"id"`
 }
 
-type FindProjectQueryResponse struct {
+type FindProjectByIDQueryResponse struct {
 	ID          string `json:"id"`
 	Description string `json:"description"`
 	Category    string `json:"category"`

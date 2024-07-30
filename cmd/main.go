@@ -1,8 +1,11 @@
 package main
 
 import (
+	"ikurotime/ideasai/internal/application/handler"
 	. "ikurotime/ideasai/internal/infrastructure/http"
-	. "ikurotime/ideasai/internal/infrastructure/http/route"
+	route "ikurotime/ideasai/internal/infrastructure/http/route"
+	"ikurotime/ideasai/internal/infrastructure/repository"
+	pkg "ikurotime/ideasai/pkg/query"
 	"net/http"
 
 	"go.uber.org/fx"
@@ -16,8 +19,15 @@ func main() {
 			fx.Annotate(
 				NewHTTPRouterGinGonic,
 				fx.ParamTags(`group:"routes"`)),
-			AsRoute(NewFindProjectByIDRoute),
-			zap.NewExample),
+			AsRoute(route.NewFindProjectByIDRoute),
+			fx.Annotate(
+				pkg.NewInternalQueryBus,
+				fx.ParamTags(`group:"queryHandler"`),
+			),
+			AsQueryHandler(handler.NewFindProjectHandler),
+			zap.NewExample,
+			repository.NewProjectRepository,
+		),
 		fx.Invoke(func(*http.Server) {}),
 	).Run()
 }

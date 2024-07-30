@@ -2,6 +2,8 @@ package http
 
 import (
 	"context"
+	query "ikurotime/ideasai/pkg/query"
+
 	"net"
 	"net/http"
 
@@ -52,5 +54,12 @@ func AsRoute(f any) any {
 		f,
 		fx.As(new(Route)),
 		fx.ResultTags(`group:"routes"`),
+	)
+}
+func AsQueryHandler(f any) any {
+	return fx.Annotate(
+		f,
+		fx.As(new(query.QueryHandler)),
+		fx.ResultTags(`group:"queryHandler"`),
 	)
 }

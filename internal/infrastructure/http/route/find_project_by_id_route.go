@@ -14,8 +14,8 @@ type FindProjectByIDRoute struct {
 	log      *zap.Logger
 }
 
-func NewFindProjectByIDRoute(log *zap.Logger) *FindProjectByIDRoute {
-	return &FindProjectByIDRoute{log: log}
+func NewFindProjectByIDRoute(queryBus pkg.QueryBus, log *zap.Logger) *FindProjectByIDRoute {
+	return &FindProjectByIDRoute{queryBus, log}
 }
 
 func (h *FindProjectByIDRoute) Method() string {
@@ -23,17 +23,17 @@ func (h *FindProjectByIDRoute) Method() string {
 }
 
 func (h *FindProjectByIDRoute) Pattern() string {
-	return "/project/{id}"
+	return "/project/:id"
 }
 
-func (h *FindProjectByIDRoute) Handle(ctx *gin.Context) {
-	var q query.FindProjectQuery
+func (h *FindProjectByIDRoute) Handler(ctx *gin.Context) {
+
 	id := ctx.Param("id")
 	h.log.Info("FindProjectByIDRoute.ServeHTTP", zap.String("id", id))
 
-	q.ID = id
+	q := query.FindProjectByIDQuery{ID: id}
 
-	response, err := h.queryBus.Execute(&q)
+	response, err := h.queryBus.Execute(q)
 
 	if err != nil {
 		h.log.Error("Failed to execute query", zap.Error(err))
